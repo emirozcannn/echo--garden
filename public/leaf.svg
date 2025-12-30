@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#68d391;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#48bb78;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#276749;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main Leaf -->
+  <path d="M50 10 Q85 30 85 60 Q85 85 50 95 Q15 85 15 60 Q15 30 50 10" 
+        fill="url(#leafGrad)" filter="url(#glow)"/>
+  
+  <!-- Leaf Vein -->
+  <path d="M50 20 L50 85" stroke="#276749" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M50 35 Q35 45 25 50" stroke="#276749" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M50 35 Q65 45 75 50" stroke="#276749" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M50 50 Q35 58 28 65" stroke="#276749" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M50 50 Q65 58 72 65" stroke="#276749" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M50 65 Q38 72 32 78" stroke="#276749" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M50 65 Q62 72 68 78" stroke="#276749" stroke-width="1.5" fill="none" opacity="0.5"/>
+  
+  <!-- Sound Wave Accent -->
+  <circle cx="50" cy="50" r="3" fill="#fde047" opacity="0.8">
+    <animate attributeName="r" values="3;5;3" dur="1.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0.4;0.8" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>
