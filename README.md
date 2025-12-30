@@ -69,8 +69,8 @@ Sessizlik          → Doğanın nefes aldığı anlar
 
 ```bash
 # Klonla
-git clone https://github.com/emirozcannn/echo-garden.git
-cd echo-garden
+git clone https://github.com/emirozcannn/echo--garden.git
+cd echo--garden
 
 # Kur
 npm install
@@ -80,6 +80,16 @@ npm run dev
 ```
 
 Tarayıcıda `http://localhost:5173` adresine git ve mikrofonu aç!
+
+### 🔧 Spotify Entegrasyonu (Opsiyonel)
+
+```bash
+# .env dosyası oluştur
+cp .env.example .env
+
+# Spotify Developer Dashboard'dan Client ID al
+# https://developer.spotify.com/dashboard
+```
 
 ---
 
@@ -235,7 +245,35 @@ MIT License - Özgürce kullan, değiştir, dağıt!
 
 ---
 
-## 👤 Geliştirici
+## � Geliştirme Yol Haritası
+
+Detaylı yol haritası için [ROADMAP.md](ROADMAP.md) dosyasına bakın.
+
+### ✅ Tamamlanan
+- Post-processing efektleri (Bloom, SSAO, DOF)
+- Meyda.js gelişmiş ses analizi
+- TensorFlow.js duygu tanıma
+- 16 farklı bitki türü
+- Büyüme animasyon sistemi
+- Ses-görsel eşleme sistemi
+
+### 🚧 Devam Eden
+- Volumetrik bulutlar
+- Hava durumu sistemi (yağmur, kar, sis)
+- Su yüzeyi simülasyonu
+- Export sistemi (4K screenshot, video)
+- Spotify entegrasyonu
+- YouTube entegrasyonu
+
+### 📋 Yakında
+- WebXR VR/AR desteği
+- Çoklu kullanıcı bahçeleri
+- Neural style transfer
+- Marketplace ve premium özellikler
+
+---
+
+## �👤 Geliştirici
 
 **Emir Özcan**
 - GitHub: [@emirozcannn](https://github.com/emirozcannn)
