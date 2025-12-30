@@ -179,7 +179,12 @@ export class TFEmotionClassifier {
   async loadModel(modelUrl?: string): Promise<void> {
     try {
       // Dynamic import to avoid loading TF when not needed
-      const tf = await import('@tensorflow/tfjs');
+      const tf = await import(/* @vite-ignore */ '@tensorflow/tfjs').catch(() => null);
+      
+      if (!tf) {
+        console.warn('TensorFlow.js not available, using fallback classifier');
+        return;
+      }
       
       if (modelUrl) {
         this.model = await tf.loadLayersModel(modelUrl);
@@ -240,7 +245,10 @@ export class TFEmotionClassifier {
     }
     
     try {
-      const tf = await import('@tensorflow/tfjs');
+      const tf = await import(/* @vite-ignore */ '@tensorflow/tfjs').catch(() => null);
+      if (!tf) {
+        return this.fallbackClassifier.classify(audioFeatures);
+      }
       
       // Prepare features
       const features = this.prepareFeatures(audioFeatures);

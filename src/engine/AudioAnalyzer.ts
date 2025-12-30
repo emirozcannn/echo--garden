@@ -14,6 +14,7 @@ export interface AudioFeatures {
   spectralCentroid: number;  // Brightness of sound
   spectralFlux: number; // Rate of change
   zeroCrossingRate: number;  // Noisiness
+  silence: boolean;     // Is this a silent frame?
   
   // Rhythm
   bpm: number;
@@ -107,8 +108,8 @@ export class AudioAnalyzer {
     }
     
     // Get raw data
-    this.analyser.getFloatFrequencyData(this.frequencyData);
-    this.analyser.getFloatTimeDomainData(this.waveformData);
+    this.analyser.getFloatFrequencyData(this.frequencyData as Float32Array<ArrayBuffer>);
+    this.analyser.getFloatTimeDomainData(this.waveformData as Float32Array<ArrayBuffer>);
     
     // Calculate frequency bands
     const bass = this.getFrequencyRangeAverage(20, 250);
@@ -145,6 +146,7 @@ export class AudioAnalyzer {
       spectralCentroid,
       spectralFlux,
       zeroCrossingRate,
+      silence: energy < 0.05,
       bpm,
       beat,
       frequencyData: this.frequencyData,
@@ -284,6 +286,7 @@ export class AudioAnalyzer {
       zeroCrossingRate: 0,
       bpm: 120,
       beat: false,
+      silence: true,
       frequencyData: new Float32Array(0),
       waveformData: new Float32Array(0),
     };

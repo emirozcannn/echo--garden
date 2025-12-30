@@ -243,7 +243,11 @@ export function useSpotify() {
             silence: features.energy < 0.1,
             spectralCentroid: features.valence,
             spectralFlux: features.tempo / 200,
-          });
+            zeroCrossingRate: features.speechiness * 100,
+            bpm: features.tempo,
+            frequencyData: new Float32Array(0),
+            waveformData: new Float32Array(0),
+          } as any);
         }
       }
     }, 1000);

@@ -1,7 +1,9 @@
 // Advanced Audio Analyzer with Meyda.js
 // Professional audio feature extraction for reactive visuals
 
-import Meyda, { MeydaAnalyzer, MeydaFeaturesObject } from 'meyda';
+import Meyda from 'meyda';
+type MeydaAnalyzer = ReturnType<typeof Meyda.createMeydaAnalyzer>;
+type MeydaFeaturesObject = any;
 
 export interface AdvancedAudioFeatures {
   // Basic frequency bands (0-1 normalized)
@@ -160,7 +162,7 @@ export class AdvancedAudioAnalyzer {
     const bands = this.extractFrequencyBands(spectrum);
     
     // Onset detection using spectral flux
-    const flux = (meydaFeatures.spectralFlux as number) ?? 0;
+    const flux = ((meydaFeatures as any).spectralFlux as number) ?? 0;
     const onsetDetected = this.detectOnset(flux);
     
     // Beat detection
@@ -212,7 +214,7 @@ export class AdvancedAudioAnalyzer {
       // Raw
       amplitudeSpectrum: spectrum,
       powerSpectrum: meydaFeatures.powerSpectrum as Float32Array,
-      buffer: meydaFeatures.buffer as Float32Array,
+      buffer: new Float32Array(meydaFeatures.buffer as number[] || []),
     };
     
     // Apply smoothing
@@ -321,7 +323,7 @@ export class AdvancedAudioAnalyzer {
   
   private deriveTexture(features: MeydaFeaturesObject): 'smooth' | 'rough' | 'rhythmic' {
     const zcr = features.zcr as number;
-    const flux = features.spectralFlux as number;
+    const flux = (features as any).spectralFlux as number ?? 0;
     
     if (zcr > 0.3 || flux > 0.5) {
       return 'rough';

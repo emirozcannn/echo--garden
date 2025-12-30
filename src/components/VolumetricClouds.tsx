@@ -212,16 +212,7 @@ const CloudMaterial = shaderMaterial(
   `
 );
 
-extend({ CloudMaterial });
-
-// Type declaration
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      cloudMaterial: any;
-    }
-  }
-}
+extend({ CloudMaterial: CloudMaterial as any });
 
 // Cloud Dome Component
 interface VolumetricCloudsProps {
@@ -284,12 +275,13 @@ export function VolumetricClouds({
   return (
     <mesh scale={[200, 200, 200]}>
       <sphereGeometry args={[1, 32, 32]} />
-      <cloudMaterial
+      <primitive
+        object={new CloudMaterial()}
         ref={materialRef}
+        attach="material"
         side={THREE.BackSide}
         transparent
         depthWrite={false}
-        uSunPosition={new THREE.Vector3(...sunPosition)}
       />
     </mesh>
   );

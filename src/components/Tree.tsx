@@ -61,8 +61,8 @@ export function Tree({
       }
     }
     
-    const lsystemString = generateLSystem(baseConfig as LSystemConfig, actualSeed);
-    const branches = interpretLSystem(lsystemString, baseConfig as LSystemConfig, 0.3, actualSeed);
+    const lsystemString = generateLSystem(baseConfig as unknown as LSystemConfig, actualSeed);
+    const branches = interpretLSystem(lsystemString, baseConfig as unknown as LSystemConfig, 0.3, actualSeed);
     
     // Generate leaf positions
     const leafPositions: THREE.Vector3[] = [];

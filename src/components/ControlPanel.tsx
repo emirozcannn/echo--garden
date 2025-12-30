@@ -6,10 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mic,
   MicOff,
-  Upload,
   Settings,
   Eye,
-  EyeOff,
   RotateCcw,
   Sparkles,
   Trees,
@@ -18,12 +16,12 @@ import {
   Volume2,
   ChevronDown,
   ChevronUp,
-  Seedling,
+  Sprout,
 } from 'lucide-react';
-import { useGardenStore, useIsListening } from '../hooks/useGarden';
-import { useAudio, useAudioVisualizer } from '../hooks/useAudio';
-import { EMOTION_COLORS, EMOTION_EMOJIS, Emotion } from '../engine/SentimentEngine';
-import { SEASON_EMOJIS, SEASON_NAMES, Season } from '../engine/SeasonManager';
+import { useGardenStore, useIsListening, useAudioFeatures } from '../hooks/useGarden';
+import { useAudio } from '../hooks/useAudio';
+import { EMOTION_EMOJIS } from '../engine/SentimentEngine';
+import { SEASON_EMOJIS, SEASON_NAMES } from '../engine/SeasonManager';
 
 export function ControlPanel() {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -43,7 +41,18 @@ export function ControlPanel() {
   
   const { startMicrophone, stop } = useAudio();
   const isListening = useIsListening();
-  const { getVisualizerBars } = useAudioVisualizer();
+  const audioFeatures = useAudioFeatures();
+  
+  // Create visualizer bars from audio features
+  const getVisualizerBars = (count: number) => {
+    const bars = [];
+    const features = audioFeatures;
+    const bands = [features.bass, features.lowMids, features.mids, features.highMids, features.treble];
+    for (let i = 0; i < count; i++) {
+      bars.push(bands[i % bands.length] * (0.5 + Math.random() * 0.5));
+    }
+    return bars;
+  };
   
   const visualizerBars = getVisualizerBars(16);
   
@@ -77,7 +86,7 @@ export function ControlPanel() {
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-spring/20 flex items-center justify-center">
-              <Seedling className="w-5 h-5 text-spring" />
+              <Sprout className="w-5 h-5 text-spring" />
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold">Echo Garden</h2>

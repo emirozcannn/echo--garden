@@ -138,7 +138,10 @@ export function Cherry({
       
       // More petals on beat
       if (beat) {
-        petalsRef.current.material.opacity = Math.min(1, 0.6 + energy * 0.4);
+        const material = petalsRef.current.material as THREE.MeshBasicMaterial;
+        if (material && 'opacity' in material) {
+          material.opacity = Math.min(1, 0.6 + energy * 0.4);
+        }
       }
     }
   });

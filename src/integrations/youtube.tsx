@@ -161,7 +161,11 @@ export function useYouTube() {
         silence: false,
         spectralCentroid: 0.5 + pseudoRandom(time + 6) * 0.3,
         spectralFlux: pseudoRandom(time + 7) * 0.5,
-      });
+        zeroCrossingRate: pseudoRandom(time + 8) * 50,
+        bpm: 120,
+        frequencyData: new Float32Array(0),
+        waveformData: new Float32Array(0),
+      } as any);
       
       setCurrentTime(time);
       setDuration(duration);

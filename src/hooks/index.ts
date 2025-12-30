@@ -15,11 +15,7 @@ export {
 } from './useGarden';
 
 // Audio
-export { 
-  default as useAudio, 
-  useAudioContext, 
-  useAudioFile 
-} from './useAudio';
+export { useAudio } from './useAudio';
 
 // Growth animation
 export { 

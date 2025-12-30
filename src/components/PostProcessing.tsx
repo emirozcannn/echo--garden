@@ -103,7 +103,7 @@ export function PostProcessing({ quality = 'high' }: PostProcessingProps) {
       />
       
       {/* SSAO - Ambient Occlusion for depth */}
-      {quality !== 'low' && (
+      {(quality === 'medium' || quality === 'high' || quality === 'ultra') && (
         <SSAO
           samples={ssaoConfig.samples}
           radius={ssaoConfig.radius}
