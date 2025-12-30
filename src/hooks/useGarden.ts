@@ -77,17 +77,17 @@ function stringToSeedNumber(str: string): number {
 }
 
 const DEFAULT_SETTINGS: GardenSettings = {
-  quality: 'high',
+  quality: 'medium',
   showParticles: true,
-  showShadows: true,
+  showShadows: false,
   autoRotate: false,
   showGrid: false,
   showStats: false,
-  audioSensitivity: 1,
-  smoothing: 0.8,
-  treeCount: 5,
-  flowerDensity: 0.5,
-  grassDensity: 0.7,
+  audioSensitivity: 2.5,
+  smoothing: 0.6,
+  treeCount: 3,
+  flowerDensity: 0.3,
+  grassDensity: 0.3,
 };
 
 const DEFAULT_EMOTION: EmotionState = {

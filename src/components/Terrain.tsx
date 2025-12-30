@@ -26,12 +26,12 @@ export function Terrain({
   const emotion = useEmotion();
   const season = useSeason();
   
-  // Generate terrain geometry
+  // Generate terrain geometry - SIMPLIFIED
   const geometry = useMemo(() => {
     const geo = new THREE.PlaneGeometry(size, size, segments, segments);
     const positions = geo.attributes.position.array as Float32Array;
     
-    // Apply Perlin noise
+    // Apply Perlin noise - single octave for performance
     for (let i = 0; i < positions.length; i += 3) {
       const x = positions[i];
       const z = positions[i + 1];
@@ -39,10 +39,8 @@ export function Terrain({
       const noiseX = (x + size / 2) / size + seedNumber * 0.001;
       const noiseZ = (z + size / 2) / size + seedNumber * 0.001;
       
-      let height = fbm(noiseX * 3, noiseZ * 3, 6) * heightScale;
-      
-      // Add some variation
-      height += fbm(noiseX * 8, noiseZ * 8, 3) * heightScale * 0.3;
+      // Single octave, no additional variation
+      const height = fbm(noiseX * 2, noiseZ * 2, 3) * heightScale;
       
       positions[i + 2] = height;
     }
@@ -53,30 +51,9 @@ export function Terrain({
     return geo;
   }, [size, segments, heightScale, seedNumber]);
   
-  // Audio reactive ripples
+  // Audio reactive ripples - DISABLED for performance
   useFrame((state) => {
-    if (!meshRef.current || !audioReactive) return;
-    
-    const bass = audioFeatures?.bass ?? 0;
-    const beat = audioFeatures?.beat ?? false;
-    const time = state.clock.elapsedTime;
-    
-    const positions = meshRef.current.geometry.attributes.position.array as Float32Array;
-    const originalPositions = geometry.attributes.position.array as Float32Array;
-    
-    if (beat && bass > 0.3) {
-      // Create ripple effect on beat
-      for (let i = 0; i < positions.length; i += 3) {
-        const x = originalPositions[i];
-        const z = originalPositions[i + 2];
-        const dist = Math.sqrt(x * x + z * z);
-        
-        const ripple = Math.sin(dist * 0.5 - time * 5) * bass * 0.5;
-        positions[i + 1] = originalPositions[i + 1] + ripple;
-      }
-      
-      meshRef.current.geometry.attributes.position.needsUpdate = true;
-    }
+    // Removed for better performance
   });
   
   // Get ground color based on emotion and season
@@ -152,12 +129,15 @@ export function GrassPatches({
     return '#68d391'; // spring
   }, [emotion?.primary, season?.current]);
   
-  // Update instance matrices
+  // Update instance matrices - SIMPLIFIED for performance
   useFrame((state) => {
     if (!meshRef.current) return;
     
     const time = state.clock.elapsedTime;
     const treble = audioFeatures?.treble ?? 0;
+    
+    // Only update every 3rd frame for performance
+    if (Math.floor(time * 60) % 3 !== 0) return;
     
     const dummy = new THREE.Object3D();
     
@@ -166,12 +146,12 @@ export function GrassPatches({
       const rot = rotations[i];
       const scale = scales[i];
       
-      // Wind sway
-      const sway = Math.sin(time * 2 + pos.x * 0.5) * (0.1 + treble * 0.3);
+      // Simplified wind sway
+      const sway = Math.sin(time + pos.x) * (0.05 + treble * 0.2);
       
       dummy.position.copy(pos);
-      dummy.rotation.set(sway, rot, sway * 0.5);
-      dummy.scale.set(scale, scale * (0.8 + treble * 0.4), scale);
+      dummy.rotation.set(sway, rot, 0);
+      dummy.scale.set(scale, scale, scale);
       dummy.updateMatrix();
       
       meshRef.current.setMatrixAt(i, dummy.matrix);

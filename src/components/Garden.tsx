@@ -14,6 +14,122 @@ import { FlowerField, Mushroom } from './Flower';
 import { useGardenStore, useSeed, useAudioFeatures, useEmotion, useSeason } from '../hooks/useGarden';
 import { TreePresetName, TREE_PRESETS } from '../utils/lsystem';
 
+// Audio Visualizer - Merkezdeki büyük reaktif küre
+function AudioVisualizer() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const ringRef = useRef<THREE.Mesh>(null);
+  const audioFeatures = useAudioFeatures();
+  const settings = useGardenStore((state) => state.settings);
+  
+  useFrame((_, delta) => {
+    if (!meshRef.current || !ringRef.current) return;
+    
+    const bass = (audioFeatures?.bass ?? 0) * settings.audioSensitivity;
+    const mids = (audioFeatures?.mids ?? 0) * settings.audioSensitivity;
+    const treble = (audioFeatures?.treble ?? 0) * settings.audioSensitivity;
+    const energy = (audioFeatures?.energy ?? 0) * settings.audioSensitivity;
+    
+    // Küre boyutu ses enerjisine göre değişir
+    const targetScale = 1 + energy * 2 + bass * 1.5;
+    meshRef.current.scale.lerp(
+      new THREE.Vector3(targetScale, targetScale, targetScale),
+      0.2
+    );
+    
+    // Küre rengi frekans dağılımına göre değişir
+    const material = meshRef.current.material as THREE.MeshStandardMaterial;
+    material.emissiveIntensity = 0.5 + energy * 3;
+    material.color.setHSL(
+      0.3 + bass * 0.3 - treble * 0.2, // Hue: yeşilden maviye veya turuncuya
+      0.7 + mids * 0.3,                 // Saturation
+      0.4 + energy * 0.4                // Lightness
+    );
+    material.emissive.setHSL(
+      0.3 + bass * 0.3,
+      0.8,
+      0.3 + energy * 0.5
+    );
+    
+    // Küre rotasyonu
+    meshRef.current.rotation.y += delta * (0.2 + energy);
+    meshRef.current.rotation.x += delta * (0.1 + bass * 0.5);
+    
+    // Ring pulse
+    const ringScale = 2 + bass * 3 + Math.sin(Date.now() * 0.005) * 0.3;
+    ringRef.current.scale.set(ringScale, ringScale, ringScale);
+    ringRef.current.rotation.z += delta * 0.5;
+    
+    const ringMaterial = ringRef.current.material as THREE.MeshBasicMaterial;
+    ringMaterial.opacity = 0.3 + energy * 0.5;
+  });
+  
+  return (
+    <group position={[0, 5, 0]}>
+      {/* Ana reaktif küre - basitleştirildi */}
+      <mesh ref={meshRef}>
+        <icosahedronGeometry args={[1.5, 0]} />
+        <meshBasicMaterial
+          color="#68d391"
+          wireframe
+          transparent
+          opacity={0.6}
+        />
+      </mesh>
+      
+      {/* Pulse ring - basitleştirildi */}
+      <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.8, 2, 16]} />
+        <meshBasicMaterial
+          color="#68d391"
+          transparent
+          opacity={0.4}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// Ses reaktif zemin halkaları
+function AudioReactiveGround() {
+  const ringsRef = useRef<THREE.Group>(null);
+  const audioFeatures = useAudioFeatures();
+  const settings = useGardenStore((state) => state.settings);
+  
+  useFrame(() => {
+    if (!ringsRef.current) return;
+    
+    const bass = (audioFeatures?.bass ?? 0) * settings.audioSensitivity;
+    const energy = (audioFeatures?.energy ?? 0) * settings.audioSensitivity;
+    
+    ringsRef.current.children.forEach((ring, i) => {
+      const mesh = ring as THREE.Mesh;
+      const baseScale = 3 + i * 4;
+      const pulseScale = baseScale + bass * (5 - i) + Math.sin(Date.now() * 0.003 + i) * 0.5;
+      mesh.scale.set(pulseScale, pulseScale, 1);
+      
+      const material = mesh.material as THREE.MeshBasicMaterial;
+      material.opacity = 0.1 + energy * 0.3 - i * 0.02;
+    });
+  });
+  
+  return (
+    <group ref={ringsRef} position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {[0, 1, 2].map((i) => (
+        <mesh key={i}>
+          <ringGeometry args={[3 + i * 5, 3.3 + i * 5, 24]} />
+          <meshBasicMaterial
+            color="#68d391"
+            transparent
+            opacity={0.12 - i * 0.03}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 // Camera shake on bass hits
 function CameraShake() {
   const { camera } = useThree();
@@ -28,8 +144,8 @@ function CameraShake() {
     const bass = audioFeatures?.bass ?? 0;
     const beat = audioFeatures?.beat ?? false;
     
-    if (beat && bass > 0.5) {
-      const shake = (bass - 0.5) * 0.5;
+    if (beat && bass > 0.3) {
+      const shake = bass * 0.3;
       camera.position.x += (Math.random() - 0.5) * shake;
       camera.position.y += (Math.random() - 0.5) * shake;
       camera.position.z += (Math.random() - 0.5) * shake;
@@ -109,36 +225,36 @@ function Forest() {
   );
 }
 
-// Particle system based on emotion
+// Particle system based on emotion - optimized
 function EmotionParticles() {
   const emotion = useEmotion();
   const season = useSeason();
   
-  // Determine particle type
+  // Determine particle type - MINIMAL counts
   let particleType: ParticleType = 'dust';
-  let count = 100;
+  let count = 10;
   
   if (emotion?.primary === 'anger') {
     particleType = 'sparks';
-    count = 150;
+    count = 15;
   } else if (emotion?.primary === 'calm') {
     particleType = 'fireflies';
-    count = 80;
+    count = 10;
   } else if (emotion?.primary === 'joy') {
     particleType = 'pollen';
-    count = 200;
+    count = 20;
   } else if (emotion?.primary === 'sadness') {
     particleType = 'rain';
-    count = 300;
+    count = 25;
   }
   
   // Season override
   if (season?.current === 'winter') {
     particleType = 'snow';
-    count = 400;
+    count = 30;
   } else if (season?.current === 'autumn') {
     particleType = 'leaves';
-    count = 150;
+    count = 15;
   }
   
   return <Particles type={particleType} count={count} />;
@@ -152,7 +268,7 @@ function SceneContent() {
   // Generate mushroom positions
   const mushrooms = [];
   const random = seededRandom(seedNumber + 500);
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 3; i++) {
     mushrooms.push({
       x: (random() - 0.5) * 30,
       z: (random() - 0.5) * 30,
@@ -167,14 +283,18 @@ function SceneContent() {
       
       {/* Sky */}
       <Sky />
-      <Stars count={300} />
+      <Stars count={30} />
       
-      {/* Terrain */}
-      <Terrain size={60} segments={48} heightScale={2} />
+      {/* AUDIO VISUALIZER - Merkez */}
+      <AudioVisualizer />
+      <AudioReactiveGround />
       
-      {/* Grass */}
+      {/* Terrain - agresif optimize */}
+      <Terrain size={35} segments={16} heightScale={1.5} />
+      
+      {/* Grass - minimal */}
       {settings.grassDensity > 0 && (
-        <GrassPatches count={Math.floor(500 * settings.grassDensity)} />
+        <GrassPatches count={Math.floor(15 * settings.grassDensity)} />
       )}
       
       {/* Trees */}
@@ -182,7 +302,7 @@ function SceneContent() {
       
       {/* Flowers */}
       {settings.flowerDensity > 0 && (
-        <FlowerField count={Math.floor(50 * settings.flowerDensity)} />
+        <FlowerField count={Math.floor(20 * settings.flowerDensity)} />
       )}
       
       {/* Mushrooms */}
@@ -194,11 +314,10 @@ function SceneContent() {
       {settings.showParticles && <EmotionParticles />}
       
       {/* Camera effects */}
-      <CameraShake />
       <AutoRotate enabled={settings.autoRotate} />
       
       {/* Fog */}
-      <fog attach="fog" args={['#0a0a0f', 20, 80]} />
+      <fog attach="fog" args={['#0a0a0f', 15, 50]} />
     </>
   );
 }
@@ -228,12 +347,15 @@ export function Garden() {
   return (
     <div className="canvas-container">
       <Canvas
-        shadows={settings.showShadows}
-        dpr={pixelRatio}
+        shadows={false}
+        dpr={Math.min(pixelRatio, 1)}
+        performance={{ min: 0.3, max: 0.8 }}
         gl={{
-          antialias: settings.quality !== 'low',
-          alpha: true,
-          preserveDrawingBuffer: true,
+          antialias: false,
+          alpha: false,
+          powerPreference: 'high-performance',
+          stencil: false,
+          depth: true,
         }}
       >
         <PerspectiveCamera
@@ -248,6 +370,7 @@ export function Garden() {
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
+          enableDamping={false}
           minDistance={5}
           maxDistance={60}
           maxPolarAngle={Math.PI / 2 - 0.1}

@@ -63,48 +63,33 @@ export function Flower({
   // Bloom animation state
   const bloomRef = useRef(0);
   
-  // Animation
+  // Animation - SIMPLIFIED for performance
   useFrame((state) => {
     if (!groupRef.current) return;
     
     const time = state.clock.elapsedTime;
     const energy = audioReactive ? (audioFeatures?.energy ?? 0) : 0;
-    const beat = audioReactive ? (audioFeatures?.beat ?? false) : false;
-    const mids = audioReactive ? (audioFeatures?.mids ?? 0) : 0;
     
-    // Bloom on high mids
-    if (mids > 0.4) {
-      bloomRef.current = Math.min(1, bloomRef.current + 0.05);
-    } else {
-      bloomRef.current = Math.max(0.5, bloomRef.current - 0.01);
-    }
+    // Simple bloom based on energy
+    bloomRef.current = 0.7 + energy * 0.3;
     
-    // Apply bloom to scale
-    const bloomScale = 0.5 + bloomRef.current * 0.5;
-    groupRef.current.scale.setScalar(scale * bloomScale);
-    
-    // Gentle sway
-    groupRef.current.rotation.z = Math.sin(time * 1.5 + position[0]) * 0.05;
-    groupRef.current.rotation.x = Math.sin(time + position[2]) * 0.03;
-    
-    // Pulse on beat
-    if (beat) {
-      groupRef.current.scale.multiplyScalar(1.1);
-    }
+    // Simplified rotation
+    groupRef.current.rotation.y = time * 0.1;
+    groupRef.current.scale.setScalar(scale * bloomRef.current);
   });
   
   return (
     <group ref={groupRef} position={position} scale={scale}>
-      {/* Stem */}
+      {/* Stem - simplified */}
       <mesh position={[0, -0.3, 0]}>
-        <cylinderGeometry args={[0.02, 0.03, 0.6, 8]} />
-        <meshStandardMaterial color="#228b22" roughness={0.8} />
+        <cylinderGeometry args={[0.02, 0.03, 0.6, 4]} />
+        <meshBasicMaterial color="#228b22" />
       </mesh>
       
-      {/* Center */}
+      {/* Center - simplified */}
       <mesh position={[0, 0.05, 0]}>
-        <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color={colors.center} roughness={0.6} />
+        <sphereGeometry args={[0.1, 8, 8]} />
+        <meshBasicMaterial color={colors.center} />
       </mesh>
       
       {/* Petals */}

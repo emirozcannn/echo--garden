@@ -107,9 +107,12 @@ export function Particles({
     return { positions, velocities, phases, sizes };
   }, [count, spread, type]);
   
-  // Animation
+  // Animation - OPTIMIZED: Update every other frame
   useFrame((state, delta) => {
     if (!pointsRef.current) return;
+    
+    // Skip every other frame for better performance
+    if (Math.floor(state.clock.elapsedTime * 60) % 2 !== 0) return;
     
     const posArray = pointsRef.current.geometry.attributes.position.array as Float32Array;
     const time = state.clock.elapsedTime;

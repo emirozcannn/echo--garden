@@ -14,7 +14,30 @@ export function Sky({ audioReactive = true }: SkyProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const emotion = useEmotion();
   const season = useSeason();
-  const audioFeatures = useAudioFeatures();
+  
+  // Simple sky color based on emotion
+  const skyColor = useMemo(() => {
+    if (emotion?.primary === 'anger') return '#1a0505';
+    if (emotion?.primary === 'calm') return '#051a1a';
+    if (emotion?.primary === 'joy') return '#1a1a05';
+    if (emotion?.primary === 'sadness') return '#0a0a1a';
+    if (emotion?.primary === 'thought') return '#0a051a';
+    
+    // Season default
+    if (season?.current === 'summer') return '#1a2a4a';
+    if (season?.current === 'autumn') return '#2a1a1a';
+    if (season?.current === 'winter') return '#1a1a2a';
+    
+    return '#0a0a1a'; // spring default
+  }, [emotion?.primary, season?.current]);
+  
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[100, 16, 16]} />
+      <meshBasicMaterial color={skyColor} side={THREE.BackSide} />
+    </mesh>
+  );
+}
   
   // Get sky colors based on emotion and season
   const skyColors = useMemo(() => {
@@ -182,10 +205,9 @@ export function Sky({ audioReactive = true }: SkyProps) {
   );
 }
 
-// Stars for night sky
-export function Stars({ count = 500 }: { count?: number }) {
+// Stars for night sky - SIMPLIFIED
+export function Stars({ count = 50 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
-  const audioFeatures = useAudioFeatures();
   
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
@@ -194,8 +216,8 @@ export function Stars({ count = 500 }: { count?: number }) {
       const i3 = i * 3;
       // Distribute on hemisphere
       const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(Math.random() * 0.8 + 0.2); // Upper hemisphere
-      const radius = 90 + Math.random() * 5;
+      const phi = Math.acos(Math.random() * 0.8 + 0.2);
+      const radius = 90;
       
       pos[i3] = radius * Math.sin(phi) * Math.cos(theta);
       pos[i3 + 1] = radius * Math.cos(phi);
@@ -205,18 +227,6 @@ export function Stars({ count = 500 }: { count?: number }) {
     return pos;
   }, [count]);
   
-  // Twinkle animation
-  useFrame((state) => {
-    if (!pointsRef.current) return;
-    
-    const time = state.clock.elapsedTime;
-    const treble = audioFeatures?.treble ?? 0;
-    
-    // Modulate size for twinkle
-    const material = pointsRef.current.material as THREE.PointsMaterial;
-    material.size = 0.3 + Math.sin(time * 2) * 0.1 + treble * 0.2;
-  });
-  
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
@@ -225,6 +235,12 @@ export function Stars({ count = 500 }: { count?: number }) {
           count={count}
           array={positions}
           itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial size={0.4} color="#ffffff" transparent opacity={0.8} sizeAttenuation />
+    </points>
+  );
+}
         />
       </bufferGeometry>
       <pointsMaterial
@@ -238,11 +254,15 @@ export function Stars({ count = 500 }: { count?: number }) {
   );
 }
 
-// Sun/Moon light source
+// Sun/Moon light source - SIMPLIFIED
 export function CelestialLight() {
-  const lightRef = useRef<THREE.DirectionalLight>(null);
-  const season = useSeason();
-  const emotion = useEmotion();
+  return (
+    <>
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[10, 20, 10]} intensity={0.8} color="#ffeedd" />
+    </>
+  );
+}
   
   // Get light properties based on state
   const lightProps = useMemo(() => {

@@ -34,8 +34,8 @@ export interface AudioAnalyzerConfig {
 
 const DEFAULT_CONFIG: AudioAnalyzerConfig = {
   fftSize: 2048,
-  smoothingTimeConstant: 0.8,
-  minDecibels: -90,
+  smoothingTimeConstant: 0.65,  // Daha hızlı tepki için düşürüldü
+  minDecibels: -100,            // Daha hassas mikrofon algılama
   maxDecibels: -10,
 };
 
@@ -146,7 +146,7 @@ export class AudioAnalyzer {
       spectralCentroid,
       spectralFlux,
       zeroCrossingRate,
-      silence: energy < 0.05,
+      silence: energy < 0.01,  // Daha hassas sessizlik algılama
       bpm,
       beat,
       frequencyData: this.frequencyData,

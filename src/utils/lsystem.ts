@@ -38,7 +38,7 @@ export const TREE_PRESETS = {
     length: 2,
     lengthFactor: 0.7,
     widthFactor: 0.7,
-    iterations: 4,
+    iterations: 2,  // Reduced from 4 for performance
     randomness: 0.1
   },
   willow: {
@@ -50,7 +50,7 @@ export const TREE_PRESETS = {
     length: 1.5,
     lengthFactor: 0.75,
     widthFactor: 0.65,
-    iterations: 5,
+    iterations: 3,
     randomness: 0.15
   },
   pine: {
@@ -62,7 +62,7 @@ export const TREE_PRESETS = {
     length: 2.5,
     lengthFactor: 0.6,
     widthFactor: 0.75,
-    iterations: 4,
+    iterations: 2,
     randomness: 0.05
   },
   bonsai: {
@@ -74,7 +74,7 @@ export const TREE_PRESETS = {
     length: 0.8,
     lengthFactor: 0.65,
     widthFactor: 0.6,
-    iterations: 4,
+    iterations: 2,
     randomness: 0.2
   },
   thorny: {
@@ -86,7 +86,7 @@ export const TREE_PRESETS = {
     length: 1.2,
     lengthFactor: 0.55,
     widthFactor: 0.8,
-    iterations: 4,
+    iterations: 2,
     randomness: 0.25
   },
   crystal: {
@@ -98,7 +98,7 @@ export const TREE_PRESETS = {
     length: 1.5,
     lengthFactor: 0.7,
     widthFactor: 0.9,
-    iterations: 4,
+    iterations: 2,
     randomness: 0
   }
 } as const;
