@@ -158,8 +158,26 @@ export const useGardenStore = create<GardenState>((set) => ({
   }),
 }));
 
-// Selector hooks
-export const useAudioFeatures = () => useGardenStore((state) => state.audioFeatures);
+// Default audio features when no audio is playing
+const DEFAULT_AUDIO_FEATURES: AudioFeatures = {
+  bass: 0,
+  lowMids: 0,
+  mids: 0,
+  highMids: 0,
+  treble: 0,
+  energy: 0,
+  spectralCentroid: 0,
+  spectralFlux: 0,
+  zeroCrossingRate: 0,
+  bpm: 120,
+  beat: false,
+  silence: true,
+  frequencyData: new Float32Array(0),
+  waveformData: new Float32Array(0),
+};
+
+// Selector hooks - always return non-null values
+export const useAudioFeatures = () => useGardenStore((state) => state.audioFeatures ?? DEFAULT_AUDIO_FEATURES);
 export const useEmotion = () => useGardenStore((state) => state.emotion);
 export const useSeason = () => useGardenStore((state) => state.season);
 export const useSeed = () => useGardenStore((state) => ({ seed: state.seed, seedNumber: state.seedNumber }));
